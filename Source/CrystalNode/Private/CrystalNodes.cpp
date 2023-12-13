@@ -70,7 +70,7 @@ if (!GIsPlayInEditorWorld)//No need if running in PIE
 			FVector2D MousePosition = FSlateApplication::Get().GetCursorPos();
 			FVector2D MouseLastPosition = FSlateApplication::Get().GetLastCursorPos();
 			FVector2D WindowSize = Window->GetSizeInScreen();
-			FVector2D WindowPos = FSlateApplication::Get().GetActiveTopLevelWindow()->GetPositionInScreen();
+			FVector2D WindowPos = Window->GetPositionInScreen();
 			//Normalize Cursor Positions
 			MousePosition.X = UKismetMathLibrary::MapRangeClamped(MousePosition.X,WindowPos.X,WindowPos.X+WindowSize.X,0.0,1.0);
 			MousePosition.Y = UKismetMathLibrary::MapRangeClamped(MousePosition.Y,WindowPos.Y,WindowPos.Y+WindowSize.Y,0.0,1.0);
@@ -118,28 +118,33 @@ void FCrystalNodesModule::BeautifyEditor()
 	//TODO: Style->Set("Graph.PlayInEditor", new BOX_BRUSH());
 	Style->Set("Graph.Node.ShadowSize", FVector2D(32, 32));
 	//Regular node styles
-	FSlateBrush RegularBody = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularBody.SB_RegularBody'"))->Brush;
-	FSlateBrush RegularColor = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularColor.SB_RegularColor'"))->Brush;
-	FSlateBrush RegularSelection = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularSelection.SB_RegularSelection'"))->Brush;
-	Style->Set("Graph.Node.Body", new FSlateBrush(RegularBody) );
-	Style->Set("Graph.Node.TintedBody", new BOX_BRUSH("Blank", FMargin(0.25f)));
-	Style->Set("Graph.Node.ColorSpill",new FSlateBrush(RegularColor));
-	Style->Set("Graph.Node.TitleHighlight", new BOX_BRUSH("Blank", FMargin(0.25f)));
-	Style->Set("Graph.Node.TitleGloss", new BOX_BRUSH("Blank", FMargin(0.25f)));
-	Style->Set("Graph.Node.ShadowSelected",new FSlateBrush(RegularSelection));
-	Style->Set("Graph.Node.Shadow", new BOX_BRUSH("RegularNode_shadow", FMargin(0.48f, 0.48f)));
+	USlateBrushAsset* RegularBody = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularBody.SB_RegularBody'"));
+	USlateBrushAsset* RegularColor = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularColor.SB_RegularColor'"));
+	USlateBrushAsset* RegularSelection = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularSelection.SB_RegularSelection'"));
+	if (RegularBody&&RegularColor&&RegularSelection)
+	{
+		Style->Set("Graph.Node.Body", new FSlateBrush(RegularBody->Brush));
+		Style->Set("Graph.Node.TintedBody", new BOX_BRUSH("Blank", FMargin(0.25f)));
+		Style->Set("Graph.Node.ColorSpill",new FSlateBrush(RegularColor->Brush));
+		Style->Set("Graph.Node.TitleHighlight", new BOX_BRUSH("Blank", FMargin(0.25f)));
+		Style->Set("Graph.Node.TitleGloss", new BOX_BRUSH("Blank", FMargin(0.25f)));
+		Style->Set("Graph.Node.ShadowSelected",new FSlateBrush(RegularSelection->Brush));
+		Style->Set("Graph.Node.Shadow", new BOX_BRUSH("RegularNode_shadow", FMargin(0.48f, 0.48f)));
+		Style->Set("Graph.CollapsedNode.Body",new FSlateBrush(RegularBody->Brush));
+		Style->Set("Graph.CollapsedNode.BodyColorSpill", new FSlateBrush(RegularColor->Brush));
+	}
 	//Var node styles
-	FSlateBrush VarBody = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_VarBody.SB_VarBody'"))->Brush;
-	FSlateBrush VarColor = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_VarColor.SB_VarColor'"))->Brush;
-	FSlateBrush VarSelection = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_VarSelection.SB_VarSelection'"))->Brush;
-	Style->Set("Graph.VarNode.Body", new FSlateBrush(VarBody));
-	Style->Set("Graph.VarNode.ColorSpill", new FSlateBrush(VarColor));
-	Style->Set("Graph.VarNode.Gloss", new BOX_BRUSH("Blank", FMargin(0.25)));
-	Style->Set("Graph.VarNode.ShadowSelected", new FSlateBrush(VarSelection));
-	Style->Set("Graph.VarNode.Shadow", new BOX_BRUSH("VarNode_shadow", FMargin(0.35f, 0.25f)));
-
-	Style->Set("Graph.CollapsedNode.Body", new BOX_BRUSH("Blank", FMargin(16.f / 64.f, 25.f / 64.f, 16.f / 64.f, 16.f / 64.f)));
-	Style->Set("Graph.CollapsedNode.BodyColorSpill", new BOX_BRUSH("Blank", FMargin(16.f / 64.f, 25.f / 64.f, 16.f / 64.f, 16.f / 64.f)));
+	USlateBrushAsset* VarBody = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_VarBody.SB_VarBody'"));
+	USlateBrushAsset* VarColor = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_VarColor.SB_VarColor'"));
+	USlateBrushAsset* VarSelection = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_VarSelection.SB_VarSelection'"));
+	if(VarBody&&VarColor&&VarSelection)
+	{
+		Style->Set("Graph.VarNode.Body", new FSlateBrush(VarBody->Brush));
+		Style->Set("Graph.VarNode.ColorSpill", new FSlateBrush(VarColor->Brush));
+		Style->Set("Graph.VarNode.Gloss", new BOX_BRUSH("Blank", FMargin(0.25)));
+		Style->Set("Graph.VarNode.ShadowSelected", new FSlateBrush(VarSelection->Brush));
+		Style->Set("Graph.VarNode.Shadow", new BOX_BRUSH("VarNode_shadow", FMargin(0.35f, 0.25f)));
+	}
 	//Pin styles
 	Style->Set("Graph.Pin.Connected_VarA", new IMAGE_BRUSH("Pin_Connected", FVector2D(10.66f)));
 	Style->Set("Graph.Pin.Disconnected_VarA", new IMAGE_BRUSH("Pin_Disconnected", FVector2D(10.66f)));
@@ -213,7 +218,6 @@ void FCrystalNodesModule::OnSlateFocusChange(const FFocusEvent& FocusEvent, cons
 					GraphSelectionAnimVal = 0.0;
 					if(TSharedPtr<STextBlock> GraphText = StaticCastSharedRef<STextBlock>(Graph->GetParentWidget()->GetAllChildren()->GetChildAt(3)))
 					{
-						//FText Text =FText::AsCultureInvariant(TEXT("ArklapseFP: ")/GraphText->GetText().ToString() );
 						FText Text =FText::AsCultureInvariant(TEXT(""));
 						GraphText->SetText(Text);
 					}

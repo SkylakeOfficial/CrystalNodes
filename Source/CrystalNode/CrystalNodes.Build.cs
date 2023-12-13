@@ -40,7 +40,8 @@ public class CrystalNodes : ModuleRules
 				"Slate",
 				"SlateCore",
 				"UnrealEd", 
-				"EditorStyle" 
+				"EditorStyle",
+				"GraphEditor" 
 			}
 			);
 		
