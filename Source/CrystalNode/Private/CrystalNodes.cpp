@@ -2,6 +2,7 @@
 
 #include "CrystalNodes.h"
 
+#include "CrystalNodesSettings.h"
 #include "MaterialDomain.h"
 #include "SGraphPanel.h"
 #include "ToolMenus.h"
@@ -14,6 +15,7 @@
 #include "Materials/MaterialParameterCollection.h"
 #include "Slate/SlateBrushAsset.h"
 #include "Styling/SlateStyleMacros.h"
+#include "Engine/DeveloperSettings.h"
 
 #define LOCTEXT_NAMESPACE "FCrystalNodesModule"
 
@@ -29,6 +31,25 @@ bool FCrystalInputProcessor::HandleMouseButtonUpEvent(FSlateApplication& SlateAp
 	return false;
 }
 
+void FCrystalNodesModule::OnSettingChanged(UObject* Object, FPropertyChangedEvent& PropertyChangedEvent)
+{
+	SetupSettings();
+}
+void FCrystalNodesModule::SetupSettings()
+{
+	const UCrystalNodesSettings* Settings = GetDefault<UCrystalNodesSettings>();
+	bool Glow = Settings->EnableCursorGlow;
+	bool EdgeLight = Settings->EnableEdgeLight;
+	bool SimLight = Settings->EnableSimLight;
+	UUnrealEditorSubsystem* EditorSys = GEditor->GetEditorSubsystem<UUnrealEditorSubsystem>();
+	if (EditorMatParams)
+	{
+		UKismetMaterialLibrary::SetScalarParameterValue(EditorSys->GetEditorWorld(), EditorMatParams,"EnableCursorGlow",Glow ? 1.0 : 0.0);
+		UKismetMaterialLibrary::SetScalarParameterValue(EditorSys->GetEditorWorld(), EditorMatParams,"EnableEdgeLight",EdgeLight ? 1.0 : 0.0);
+		UKismetMaterialLibrary::SetScalarParameterValue(EditorSys->GetEditorWorld(), EditorMatParams,"EnableSimLight",SimLight ? 1.0 : 0.0);
+	}
+}
+
 void FCrystalNodesModule::StartupModule()
 {
 	MyProcessor = new FCrystalInputProcessor();
@@ -36,6 +57,8 @@ void FCrystalNodesModule::StartupModule()
 	TickDelegate = FTickerDelegate::CreateRaw( this, &FCrystalNodesModule::Tick );
 	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker( TickDelegate );
 	EditorMatParams = LoadObject<UMaterialParameterCollection>(nullptr,TEXT("/Script/Engine.MaterialParameterCollection'/CrystalNodes/Materials/Utils/MP_CrystalEditorParams.MP_CrystalEditorParams'"));
+	UCrystalNodesSettings* Settings = GetMutableDefault<UCrystalNodesSettings>();
+	SettingChangeDelegate =Settings->OnSettingChanged().AddRaw(this,&FCrystalNodesModule::OnSettingChanged);
 }
 
 void FCrystalNodesModule::ShutdownModule()
@@ -47,6 +70,7 @@ void FCrystalNodesModule::ShutdownModule()
 		FSlateApplication::Get().OnFocusChanging().Remove(SlateHandle);
 	}
 }
+
 
 bool FCrystalNodesModule::Tick(float DeltaTime)
 {

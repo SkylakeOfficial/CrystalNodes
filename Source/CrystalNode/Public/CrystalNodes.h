@@ -23,26 +23,30 @@ class FCrystalNodesModule : public IModuleInterface
 {
 public:
 	
+	void OnSettingChanged(UObject* Object, FPropertyChangedEvent& PropertyChangedEvent);
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 	
 private:
+	void SetupSettings();
 	
 	static void BeautifyEditor();
 	
 	FTickerDelegate TickDelegate;
 	FTSTicker::FDelegateHandle TickDelegateHandle;
+	FDelegateHandle SettingChangeDelegate;
 	bool Tick(float DeltaTime);
 	UMaterialParameterCollection* EditorMatParams = nullptr;
 
 	bool bEverBoundSlateDelegates = false;
 	void OnSlateFocusChange(const FFocusEvent& FocusEvent, const FWeakWidgetPath& WeakWidgetPath, const TSharedPtr<SWidget>& Widget, const FWidgetPath& WidgetPath, const TSharedPtr<SWidget>& Shared);
-
+	
 	void BindSlateDelegates()
 	{
 		SlateHandle = FSlateApplication::Get().OnFocusChanging().AddRaw(this, &FCrystalNodesModule::OnSlateFocusChange);
 		FSlateApplication::Get().RegisterInputPreProcessor(MakeShareable(MyProcessor));
 		bEverBoundSlateDelegates = true;
+		SetupSettings();
 	}
 	FCrystalInputProcessor* MyProcessor = nullptr;
 	FDelegateHandle SlateHandle;
