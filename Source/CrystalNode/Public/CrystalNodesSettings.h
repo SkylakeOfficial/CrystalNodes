@@ -17,17 +17,17 @@ public:
 	/**
 	 * Make nodes glow when close to the mouse cursor 
 	 */
-	UPROPERTY(config, EditAnywhere,DisplayName = "Enable cursor glow")
+	UPROPERTY(config, EditAnywhere, Category= "CrystalNodes", DisplayName = "Enable cursor glow")
 	bool EnableCursorGlow = true;
 	/**
 	 * Fancy edge light on the background of graph 
 	 */
-	UPROPERTY(config, EditAnywhere,DisplayName = "Enable graph edge light")
+	UPROPERTY(config, EditAnywhere, Category= "CrystalNodes", DisplayName = "Enable graph edge light")
 	bool EnableEdgeLight = true;
 	/**
 	 * Simulate a point light on the cursor, making nodes kind of skeuomorphic
 	 */
-	UPROPERTY(config, EditAnywhere,DisplayName = "Simulate light effect")
+	UPROPERTY(config, EditAnywhere, Category= "CrystalNodes", DisplayName = "Simulate light effect")
 	bool EnableSimLight = true;
 
 };
