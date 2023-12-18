@@ -74,7 +74,7 @@ void FCrystalNodesModule::ShutdownModule()
 
 bool FCrystalNodesModule::Tick(float DeltaTime)
 {
-if (!GIsPlayInEditorWorld)//No need if running in PIE
+if (!GEditor->bIsSimulatingInEditor && !GEditor->PlayWorld)//No need if running in PIE
 {
 	if ( FSlateApplication::IsInitialized())
 	{
