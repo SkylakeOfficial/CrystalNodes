@@ -155,7 +155,7 @@ void FCrystalNodesModule::BeautifyEditor()
 		Style->Set("Graph.Node.ShadowSelected",new FSlateBrush(RegularSelection->Brush));
 		Style->Set("Graph.Node.Shadow", new BOX_BRUSH("RegularNode_shadow", FMargin(0.48f, 0.48f)));
 		Style->Set("Graph.CollapsedNode.Body",new FSlateBrush(RegularBody->Brush));
-		Style->Set("Graph.CollapsedNode.BodyColorSpill", new FSlateBrush(RegularColor->Brush));
+		Style->Set("Graph.CollapsedNode.BodyColorSpill", new IMAGE_BRUSH("",FVector2D(1.0f), FLinearColor(0,0,0,0)));
 	}
 	//Var node styles
 	USlateBrushAsset* VarBody = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_VarBody.SB_VarBody'"));
