@@ -143,7 +143,12 @@ void FCrystalNodesModule::BeautifyEditor()
 	Style->Set("Graph.Node.ShadowSize", FVector2D(32, 32));
 	//Regular node styles
 	USlateBrushAsset* RegularBody = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularBody.SB_RegularBody'"));
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 7
+	//5.7 fixed the padding of node color spill. The old brush becomes legacy.
 	USlateBrushAsset* RegularColor = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularColor.SB_RegularColor'"));
+#else
+	USlateBrushAsset* RegularColor = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularColor_Legacy.SB_RegularColor_Legacy'"));
+#endif
 	USlateBrushAsset* RegularSelection = LoadObject<USlateBrushAsset>(nullptr,TEXT("/Script/Engine.SlateBrushAsset'/CrystalNodes/SB_RegularSelection.SB_RegularSelection'"));
 	if (RegularBody&&RegularColor&&RegularSelection)
 	{
