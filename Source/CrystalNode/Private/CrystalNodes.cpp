@@ -96,10 +96,11 @@ if (!GEditor->bIsSimulatingInEditor && !GEditor->PlayWorld)//No need if running 
 			FVector2D WindowSize = Window->GetSizeInScreen();
 			FVector2D WindowPos = Window->GetPositionInScreen();
 			//Normalize Cursor Positions
-			MousePosition.X = UKismetMathLibrary::MapRangeClamped(MousePosition.X,WindowPos.X,WindowPos.X+WindowSize.X,0.0,1.0);
-			MousePosition.Y = UKismetMathLibrary::MapRangeClamped(MousePosition.Y,WindowPos.Y,WindowPos.Y+WindowSize.Y,0.0,1.0);
-			MouseLastPosition.X = UKismetMathLibrary::MapRangeClamped(MouseLastPosition.X,WindowPos.X,WindowPos.X+WindowSize.X,0.0,1.0);
-			MouseLastPosition.Y = UKismetMathLibrary::MapRangeClamped(MouseLastPosition.Y,WindowPos.Y,WindowPos.Y+WindowSize.Y,0.0,1.0);
+		
+			MousePosition.X = FMath::GetMappedRangeValueClamped(FVector2D(WindowPos.X,WindowPos.X+WindowSize.X),FVector2D(0.0,1.0),MousePosition.X);
+			MousePosition.Y = FMath::GetMappedRangeValueClamped(FVector2D(WindowPos.Y,WindowPos.Y+WindowSize.Y),FVector2D(0.0,1.0),MousePosition.Y);
+			MouseLastPosition.X = FMath::GetMappedRangeValueClamped(FVector2D(WindowPos.X,WindowPos.X+WindowSize.X),FVector2D(0.0,1.0),MouseLastPosition.X);
+			MouseLastPosition.Y = FMath::GetMappedRangeValueClamped(FVector2D(WindowPos.Y,WindowPos.Y+WindowSize.Y),FVector2D(0.0,1.0),MouseLastPosition.Y);
 		
 			CursorVelTarget = (MousePosition - MouseLastPosition)*DeltaTime;
 			CursorVel = FMath::Vector2DInterpConstantTo(CursorVel,CursorVelTarget,DeltaTime,10.0f);
@@ -113,17 +114,18 @@ if (!GEditor->bIsSimulatingInEditor && !GEditor->PlayWorld)//No need if running 
 			{
 				IsDraggingVal = FMath::Clamp(IsDraggingVal - DeltaTime*2.5f,0.0f,1.0f);				
 			}
-			
-			UUnrealEditorSubsystem* EditorSys = GEditor->GetEditorSubsystem<UUnrealEditorSubsystem>();
-			if (EditorMatParams && EditorSys)
+
+			// Set MPC value for all existing worlds
+			for (const FWorldContext& WorldContext : GEngine->GetWorldContexts())
 			{
-				//Write Material Parameters
-				UKismetMaterialLibrary::SetScalarParameterValue(EditorSys->GetEditorWorld(), EditorMatParams,"CursorX",MousePosition.X);
-				UKismetMaterialLibrary::SetScalarParameterValue(EditorSys->GetEditorWorld(), EditorMatParams,"CursorY",MousePosition.Y);
-				UKismetMaterialLibrary::SetScalarParameterValue(EditorSys->GetEditorWorld(), EditorMatParams,"ViewportRatio",WindowSize.X/WindowSize.Y);
-				UKismetMaterialLibrary::SetScalarParameterValue(EditorSys->GetEditorWorld(), EditorMatParams,"IsDragging",IsDraggingVal);
-				UKismetMaterialLibrary::SetVectorParameterValue(EditorSys->GetEditorWorld(), EditorMatParams,"DragOffsetAndCursorVel",
-					FLinearColor(CursorDragOffset.X, CursorDragOffset.Y,CursorVel.X,CursorVel.Y));
+				if (WorldContext.World())
+				{
+					UKismetMaterialLibrary::SetScalarParameterValue(WorldContext.World(), EditorMatParams,"CursorX",MousePosition.X);
+					UKismetMaterialLibrary::SetScalarParameterValue(WorldContext.World(), EditorMatParams,"CursorY",MousePosition.Y);
+					UKismetMaterialLibrary::SetScalarParameterValue(WorldContext.World(), EditorMatParams,"ViewportRatio",WindowSize.X/WindowSize.Y);
+					UKismetMaterialLibrary::SetScalarParameterValue(WorldContext.World(), EditorMatParams,"IsDragging",IsDraggingVal);
+					UKismetMaterialLibrary::SetVectorParameterValue(WorldContext.World(), EditorMatParams,"DragOffsetAndCursorVel", FLinearColor(CursorDragOffset.X, CursorDragOffset.Y,CursorVel.X,CursorVel.Y));
+				}
 			}
 		}
 	}
