@@ -8,4 +8,5 @@ You can now turn off some fancy stuff at your projrct settings -> CrystalNodes.
 Have fun!
 
 ## Limitations:
-In material editors with non-UI domain materials, the dynamic parameters of node material (MousePos, ViewPos, etc) won't update properly. I have no idea why it's happening.
+The material parameter of nodes now updates properly in all windows EXCEPT BP graph that's docked to the main window. 
+Why? Because in this case the graph doesn't access any valid Material Parameter Collection Instance. It always use the default MPC value. We can do nothing but leave it not updated.
