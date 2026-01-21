@@ -42,7 +42,10 @@ public class CrystalNodes : ModuleRules
 				"UnrealEd", 
 				"EditorStyle",
 				"GraphEditor" ,
-				"DeveloperSettings"
+				"DeveloperSettings",
+				"Renderer",
+				"RenderCore",
+				"RHI"
 			}
 			);
 		
