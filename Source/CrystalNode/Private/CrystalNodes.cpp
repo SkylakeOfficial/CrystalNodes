@@ -114,6 +114,12 @@ void FCNUniformBuffer::Update()
 		return;
 	}
 	FTextureRenderTargetResource* RTResource = RenderTarget->GameThread_GetRenderTargetResource();
+	if (RTResource == nullptr)
+	{
+		// No render target resource (e.g. NullRHI / not yet initialized): nothing to write.
+		return;
+	}
+    
 	uint8* Data = (uint8*)ParamData.GetData();
 	int32 DataSize = BufferSize;
 
@@ -121,6 +127,12 @@ void FCNUniformBuffer::Update()
 		[RTResource, Data, DataSize](FRHICommandListImmediate& RHICmdList)
 		{
 			FRHITexture* RHITexture = RTResource->GetRenderTargetTexture();
+			if (RHITexture == nullptr)
+			{
+				// No real RHI texture (e.g. NullRHI / not yet initialized): nothing to write.
+				return;
+			}
+
 			RHICmdList.Transition(FRHITransitionInfo(RHITexture, ERHIAccess::Unknown, ERHIAccess::RTV));
 			uint32 Stride = 0;
 			void* TextureData = RHICmdList.LockTexture2D(
